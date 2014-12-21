@@ -1,8 +1,11 @@
 package controller;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -17,19 +20,24 @@ import dao.DistinguishedName;
 @WebServlet(description = "Tiếp nhận thông tin Distinguished Name từ client", urlPatterns = { "/ReciveCSR" })
 public class ReciveCSR extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ReciveCSR() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * @see HttpServlet#HttpServlet()
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public ReciveCSR() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
+
+	private static final int BYTES_DOWNLOAD = 1024;
+
+	protected void doPost(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 		String country = request.getParameter("c").trim();
 		String state = request.getParameter("st").trim();
 		String local = request.getParameter("l").trim();
@@ -47,7 +55,43 @@ public class ReciveCSR extends HttpServlet {
 		dn.setEmailAddress(email);
 		dn.setPassword(pwd);
 		dn.setOn(orgUnit);
-		CertificateAuthority.genCert(dn);
-	}
+		String zip = CertificateAuthority.genCert(dn);
+		/*
+		 * response.setContentType("application/octet-stream");
+		 * response.setHeader("Content-Disposition",
+		 * "attachment;filename=certificate_bundle.zip"); ServletContext ctx =
+		 * getServletContext(); InputStream is = (InputStream)
+		 * ctx.getResourceAsStream(zip);
+		 * 
+		 * int read=0; byte[] bytes = new byte[BYTES_DOWNLOAD]; OutputStream os
+		 * = response.getOutputStream();
+		 * 
+		 * while((read = is.read(bytes))!= -1){ os.write(bytes, 0, read); }
+		 * os.flush(); os.close();
+		 */
 
+		// tell browser program going to return an application file
+		// instead of html page
+		response.setContentType("application/octet-stream");
+		response.setHeader("Content-Disposition",
+				"attachment;filename=certificate_bundle.zip");
+
+		try {
+			ServletOutputStream out = response.getOutputStream();
+			BufferedInputStream bis = new BufferedInputStream(
+					new FileInputStream(zip.replace("~", "/home/annvcit")));
+
+			byte[] outputByte = new byte[4096];
+			// copy binary contect to output stream
+			while (bis.read(outputByte, 0, 4096) != -1) {
+				out.write(outputByte, 0, 4096);
+			}
+			bis.close();
+			out.flush();
+			out.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
