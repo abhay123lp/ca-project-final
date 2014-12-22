@@ -34,7 +34,6 @@ public class ReciveCSR extends HttpServlet {
 	 *      response)
 	 */
 
-
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		String country = request.getParameter("c").trim();
@@ -71,20 +70,22 @@ public class ReciveCSR extends HttpServlet {
 
 		// tell browser program going to return an application file
 		// instead of html page
-		
+
 		String fileName = commonName + ".zip";
-		
+
 		response.setContentType("application/octet-stream");
-		response.setHeader("Content-Disposition",
-				"attachment;filename=" + fileName);
+		response.setHeader("Content-Disposition", "attachment;filename="
+				+ fileName);
 
 		try {
 			ServletOutputStream out = response.getOutputStream();
+			String tPath = "/root";
+//			String aPath = "/home/annvcit";
 			BufferedInputStream bis = new BufferedInputStream(
-					new FileInputStream(zip.replace("~", "/home/annvcit")));
+					new FileInputStream(zip.replace("~", tPath)));
 
 			byte[] outputByte = new byte[4096];
-			// copy binary contect to output stream
+			// copy binary context to output stream
 			while (bis.read(outputByte, 0, 4096) != -1) {
 				out.write(outputByte, 0, 4096);
 			}

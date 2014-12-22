@@ -3,6 +3,10 @@
  */
 package util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+
 /**
  * @author annvcit
  * @full_name Nguyen Van Chuc An
@@ -14,7 +18,7 @@ public final class Util {
 	private static final String CLIENTS_FOLDER = "~/Desktop/clients_folder/";
 	private static final String ZIP_FOLDER = "~/Desktop/zip_folder/";
 	private static final String UPLOAD_FOLDER = "~/Desktop/clientupload_folder/";
-	
+
 	public static final String mkdirs(String dirName) {
 		String path = "";
 		try {
@@ -29,7 +33,6 @@ public final class Util {
 		return CLIENTS_FOLDER + dirName + "/";
 	}
 
-	
 	private static final void deleteCSRFile(String csrPath) {
 		try {
 			Runtime r = Runtime.getRuntime();
@@ -42,7 +45,6 @@ public final class Util {
 		}
 	}
 
-	
 	public static final String zip(String folderPath, String commonName) {
 		String csrPath = folderPath + commonName + "/" + commonName + ".csr";
 		deleteCSRFile(csrPath);
@@ -60,8 +62,7 @@ public final class Util {
 		return zipPath;
 
 	}
-	
-	
+
 	public static final void deleteAllZip() {
 		try {
 			Runtime r = Runtime.getRuntime();
@@ -74,5 +75,25 @@ public final class Util {
 		}
 	}
 	
-}
 
+	public static final String readTxtFile(String filePath) {
+		return readTxtFile(new File(filePath));
+	}
+
+	public static final String readTxtFile(File file) {
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			String out = "";
+			String line = "";
+			while ((line = reader.readLine()) != null) {
+				out += line;
+			}
+			reader.close();
+			return out;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+}
