@@ -3,6 +3,8 @@
  */
 package dao;
 
+import java.io.File;
+
 import util.Util;
 
 /**
@@ -19,16 +21,16 @@ public final class CertificateAuthority {
 	private static final String CLIENTS_FOLDER = "~/Desktop/clients_folder/";
 	private static final String VERIFY_FOLDER = "~/Desktop/verify_folder/";
 	private static final String CA_PASSWORD = "password";
-	
 
 	private static final void generatePrivateKey(DistinguishedName dn) {
 		String path = Util.mkdirs(dn.getCn());
 		try {
 			Runtime r = Runtime.getRuntime();
 			String last = "openssl genrsa -des3 -out " + path + dn.getCn()
-					+ ".key -passout pass:" + dn.getPassword() + " 1024 && cd " + path 
-							+ " && openssl rsa -in "+  dn.getCn() + ".key -passin pass:" + dn.getPassword() 
-							+ " -outform der " + dn.getCn() + ".der";
+					+ ".key -passout pass:" + dn.getPassword() + " 1024 && cd "
+					+ path + " && openssl rsa -in " + dn.getCn()
+					+ ".key -passin pass:" + dn.getPassword()
+					+ " -outform der " + dn.getCn() + ".der";
 			String[] cmd = new String[] { "/bin/bash", "-c", last };
 			Process p1 = r.exec(cmd);
 			p1.waitFor();
@@ -72,12 +74,11 @@ public final class CertificateAuthority {
 		return null;
 	}
 
-	
-	public static final boolean verify(String filePath) {
+	public static final boolean verify(File clientCRT) {
 		try {
 			Runtime r = Runtime.getRuntime();
-			String last = "openssl verify -CAfile " + CA_CERT + " " + filePath
-					+ " > " + VERIFY_FOLDER + "1";
+			String last = "openssl verify -CAfile " + CA_CERT + " " + clientCRT.getPath()
+					+ " > " + VERIFY_FOLDER + clientCRT.getName();
 			String[] cmd = new String[] { "/bin/bash", "-c", last };
 			Process p1 = r.exec(cmd);
 			p1.waitFor();
@@ -87,6 +88,5 @@ public final class CertificateAuthority {
 		}
 		return false;
 	}
-
 
 }
