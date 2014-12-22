@@ -3,8 +3,12 @@
  */
 package util;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 
 /**
@@ -76,9 +80,11 @@ public final class Util {
 	}
 	
 
+
 	public static final String readTxtFile(String filePath) {
 		return readTxtFile(new File(filePath));
 	}
+
 
 	public static final String readTxtFile(File file) {
 		try {
@@ -94,6 +100,32 @@ public final class Util {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static final void readCert(String certFromClientPath) {
+		File clientCert = new File(certFromClientPath);
+		File inServer = new File(UPLOAD_FOLDER + clientCert.getName());
+		
+		try {
+			BufferedInputStream bis = new BufferedInputStream(
+										new FileInputStream(clientCert));
+			BufferedOutputStream bos = new BufferedOutputStream(
+										new FileOutputStream(inServer));
+			
+			byte[] buffer = new byte[1024]; // 1024 bytes
+			int byteRead;
+			
+			while ((byteRead = bis.read(buffer)) != -1) {
+				bos.write(buffer, 0, byteRead);
+			}
+			
+			bis.close();
+			bos.close();
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }
