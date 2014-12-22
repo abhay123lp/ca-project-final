@@ -81,13 +81,12 @@ public final class CertificateAuthority {
 			String txtOutPath = VERIFY_FOLDER + clientCRT.getName();
 			String last = "openssl verify -CAfile " + CA_CERT + " " + clientCRT.getPath()
 					+ " > " + "1.txt";
+			System.out.println(last);
 			String[] cmd = new String[] { "/bin/bash", "-c", last };
 			Process p1 = r.exec(cmd);
 			p1.waitFor();
 			
 			String result = Util.readTxtFile("1.txt");
-			System.out.println(result);
-			System.out.println(txtOutPath);
 			if (result.contains("OK")) {
 				return true;
 			}
