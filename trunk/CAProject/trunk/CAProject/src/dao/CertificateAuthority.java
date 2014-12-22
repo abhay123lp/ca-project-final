@@ -74,14 +74,23 @@ public final class CertificateAuthority {
 		return null;
 	}
 
-	public static final boolean verify(File clientCRT) {
+	public static final boolean verify(String certPath) {
 		try {
+			File clientCRT = new File(certPath);
 			Runtime r = Runtime.getRuntime();
+			String txtOutPath = VERIFY_FOLDER + clientCRT.getName();
 			String last = "openssl verify -CAfile " + CA_CERT + " " + clientCRT.getPath()
-					+ " > " + VERIFY_FOLDER + clientCRT.getName();
+					+ " > " + "1.txt";
 			String[] cmd = new String[] { "/bin/bash", "-c", last };
 			Process p1 = r.exec(cmd);
 			p1.waitFor();
+			
+			String result = Util.readTxtFile("1.txt");
+			System.out.println(result);
+			System.out.println(txtOutPath);
+			if (result.contains("OK")) {
+				return true;
+			}
 			return true;
 		} catch (Exception e) {
 			e.printStackTrace();

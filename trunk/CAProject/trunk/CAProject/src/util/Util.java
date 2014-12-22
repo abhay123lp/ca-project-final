@@ -102,10 +102,10 @@ public final class Util {
 		return null;
 	}
 	
-	public static final void readCert(String certFromClientPath) {
+	public static final String readCert(String certFromClientPath) {
 		File clientCert = new File(certFromClientPath);
 		File inServer = new File(UPLOAD_FOLDER + clientCert.getName());
-		
+		String path = inServer.getAbsolutePath();
 		try {
 			BufferedInputStream bis = new BufferedInputStream(
 										new FileInputStream(clientCert));
@@ -125,7 +125,7 @@ public final class Util {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+		return path;
 	}
 
 }
