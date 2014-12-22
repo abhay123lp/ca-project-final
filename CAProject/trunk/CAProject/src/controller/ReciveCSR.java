@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import util.Util;
 import dao.CertificateAuthority;
 import dao.DistinguishedName;
 
@@ -26,7 +27,6 @@ public class ReciveCSR extends HttpServlet {
 	 */
 	public ReciveCSR() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -34,7 +34,6 @@ public class ReciveCSR extends HttpServlet {
 	 *      response)
 	 */
 
-	private static final int BYTES_DOWNLOAD = 1024;
 
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
@@ -72,9 +71,12 @@ public class ReciveCSR extends HttpServlet {
 
 		// tell browser program going to return an application file
 		// instead of html page
+		
+		String fileName = commonName + ".zip";
+		
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition",
-				"attachment;filename=certificate_bundle.zip");
+				"attachment;filename=" + fileName);
 
 		try {
 			ServletOutputStream out = response.getOutputStream();
@@ -93,5 +95,6 @@ public class ReciveCSR extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		Util.deleteAllZip();
 	}
 }
