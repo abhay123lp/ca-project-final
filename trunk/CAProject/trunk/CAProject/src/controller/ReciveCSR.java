@@ -1,3 +1,4 @@
+
 package controller;
 
 import java.io.BufferedInputStream;
@@ -79,10 +80,10 @@ public class ReciveCSR extends HttpServlet {
 
 		try {
 			ServletOutputStream out = response.getOutputStream();
-			String tPath = "/root";
-//			String aPath = "/home/annvcit";
+//			String path = "/root";
+			String path = "/home/annvcit";
 			BufferedInputStream bis = new BufferedInputStream(
-					new FileInputStream(zip.replace("~", tPath)));
+					new FileInputStream(zip.replace("~", path)));
 
 			byte[] outputByte = new byte[4096];
 			// copy binary context to output stream
