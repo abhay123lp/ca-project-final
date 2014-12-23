@@ -7,6 +7,7 @@ import java.io.File;
 
 import util.PropertyLoader;
 import util.Util;
+import dao.DistinguishedName;
 
 /**
  * @author annvcit
@@ -15,18 +16,21 @@ import util.Util;
  * @email annvcit@gmail.com
  */
 public final class CertificateAuthority {
-	static {
-		CA_PRIKEY = PropertyLoader.loadProperty("ca_prikey");
-		CA_CERT = PropertyLoader.loadProperty("ca_cert");
-		CLIENTS_FOLDER = PropertyLoader.loadProperty("clients_folder");
-		VERIFY_FOLDER = PropertyLoader.loadProperty("verify_folder");
-		CA_PASSWORD = PropertyLoader.loadProperty("ca_password");
-	}
-	private static String CA_PRIKEY = "~/Desktop/ca_folder/prikey.key";
-	private static String CA_CERT = "~/Desktop/ca_folder/cacert.crt";
-	private static String CLIENTS_FOLDER = "~/Desktop/clients_folder/";
-	private static String VERIFY_FOLDER = "/home/annvcit/Desktop/verify_folder/";
-	private static String CA_PASSWORD = "password";
+	// static {
+	// CA_PRIKEY = PropertyLoader.loadProperty("ca_prikey");
+	// CA_CERT = PropertyLoader.loadProperty("ca_cert");
+	// CLIENTS_FOLDER = PropertyLoader.loadProperty("clients_folder");
+	// VERIFY_FOLDER = PropertyLoader.loadProperty("verify_folder");
+	// CA_PASSWORD = PropertyLoader.loadProperty("ca_password");
+	// }
+	private static String CA_PRIKEY = PropertyLoader.loadProperty("ca_prikey");
+	private static String CA_CERT = PropertyLoader.loadProperty("ca_cert");
+	private static String CLIENTS_FOLDER = PropertyLoader
+			.loadProperty("clients_folder");
+	private static String VERIFY_FOLDER = PropertyLoader
+			.loadProperty("verify_folder");
+	private static String CA_PASSWORD = PropertyLoader
+			.loadProperty("ca_password");
 
 	// tạo private key cho client => tạo csr
 	private static final void generatePrivateKey(DistinguishedName dn) {
@@ -45,16 +49,18 @@ public final class CertificateAuthority {
 		Util.exec(genCSR);
 	}
 
-	// tạo certificate cho client 
-	// return về đường dẫn file zip chứa file *.cert và *.key => cho client download
+	// tạo certificate cho client
+	// return về đường dẫn file zip chứa file *.cert và *.key => cho client
+	// download
 	public static final String genCert(DistinguishedName dn) {
 		generatePrivateKey(dn);
 		generateCSR(dn);
+		
 		String path = Util.mkdirs(dn.getCn());
-		String genCert = "openssl x509 -req -days 365 -in " + path
-				+ dn.getCn() + ".csr -CA " + CA_CERT + " -CAkey "
-				+ CA_PRIKEY + " -passin pass:" + CA_PASSWORD
-				+ " -CAcreateserial -out " + path + dn.getCn() + ".crt";
+		String genCert = "openssl x509 -req -days 365 -in " + path + dn.getCn()
+				+ ".csr -CA " + CA_CERT + " -CAkey " + CA_PRIKEY
+				+ " -passin pass:" + CA_PASSWORD + " -CAcreateserial -out "
+				+ path + dn.getCn() + ".crt";
 		Util.exec(genCert);
 		return Util.zip(CLIENTS_FOLDER, dn.getCn());
 	}
@@ -63,8 +69,8 @@ public final class CertificateAuthority {
 	public static final boolean verify(String certPath) {
 		File clientCRT = new File(certPath);
 		String textFilePath = VERIFY_FOLDER + clientCRT.getName() + ".txt";
-		String command = "openssl verify -CAfile " + CA_CERT + " " + clientCRT.getPath()
-				+ " > " + textFilePath;
+		String command = "openssl verify -CAfile " + CA_CERT + " "
+				+ clientCRT.getPath() + " > " + textFilePath;
 		Util.exec(command);
 		String result = Util.readTxtFile(textFilePath);
 		if (result.contains("OK")) {

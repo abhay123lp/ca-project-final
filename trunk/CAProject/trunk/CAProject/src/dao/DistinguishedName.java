@@ -1,10 +1,6 @@
 package dao;
 
 /**
- * 
- */
-
-/**
  * @author annvcit
  * @full_name Nguyen Van Chuc An
  * @date_created Dec 21, 2014

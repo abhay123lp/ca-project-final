@@ -5,7 +5,6 @@ package util;
 
 import java.io.InputStream;
 import java.util.Properties;
-import java.util.logging.FileHandler;
 
 /**
  * @author annvcit
@@ -19,8 +18,8 @@ public class PropertyLoader {
 		String value = null;
 		Properties p = new Properties();
 		try {
-			InputStream is = FileHandler.class.
-					getClassLoader().getResourceAsStream("config.properties");
+			InputStream is = PropertyLoader.class.getResourceAsStream("/config.properties");
+			
 			p.load(is);
 			value = p.getProperty(propertyName);
 		} catch (Exception e) {

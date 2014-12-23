@@ -72,7 +72,7 @@ public class ReciveCSR extends HttpServlet {
 		// tell browser program going to return an application file
 		// instead of html page
 
-		String fileName = commonName + ".zip";
+		String fileName = dn.getCn() + ".zip";
 
 		response.setContentType("application/octet-stream");
 		response.setHeader("Content-Disposition", "attachment;filename="
@@ -80,7 +80,9 @@ public class ReciveCSR extends HttpServlet {
 
 		try {
 			ServletOutputStream out = response.getOutputStream();
+
 			String path = PropertyLoader.loadProperty("root");
+
 			BufferedInputStream bis = new BufferedInputStream(
 					new FileInputStream(zip.replace("~", path)));
 
