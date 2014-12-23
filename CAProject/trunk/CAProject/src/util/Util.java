@@ -14,15 +14,13 @@ import java.io.FileReader;
  * @email annvcit@gmail.com
  */
 public final class Util {
-	static {
-		CLIENTS_FOLDER = PropertyLoader.loadProperty("client_folder");
-		ZIP_FOLDER = PropertyLoader.loadProperty("zip_folder");
-	}
-	
-	private static String CLIENTS_FOLDER = null;
-	private static String ZIP_FOLDER = null;;
-	
-	// execute một command 
+
+	private static String CLIENTS_FOLDER = PropertyLoader
+			.loadProperty("clients_folder");
+	private static String ZIP_FOLDER = PropertyLoader
+			.loadProperty("zip_folder");
+
+	// execute một command
 	public static final void exec(String command) {
 		try {
 			Runtime r = Runtime.getRuntime();
@@ -33,11 +31,12 @@ public final class Util {
 			e.printStackTrace();
 		}
 	}
-	
+
 	// xóa thư mục
 	public static final String mkdirs(String dirName) {
 		String path = CLIENTS_FOLDER + dirName + "/";
-		String command =  "mkdir -p " + path;
+
+		String command = "mkdir -p " + path;
 		exec(command);
 		return CLIENTS_FOLDER + dirName + "/";
 	}
@@ -49,8 +48,8 @@ public final class Util {
 	}
 
 	// nén folder thành file zip để gửi cho client
-	// folderPath & commonName: param cần thiết để xóa file *.csr 
-		// vì chỉ gửi cho client file *.crt và file *.key (private key)
+	// folderPath & commonName: param cần thiết để xóa file *.csr
+	// vì chỉ gửi cho client file *.crt và file *.key (private key)
 	public static final String zip(String folderPath, String commonName) {
 		String csrPath = folderPath + commonName + "/" + commonName + ".csr";
 		deleteCSRFile(csrPath);
@@ -63,16 +62,14 @@ public final class Util {
 
 	}
 
-	
-	/*public static final void deleteAllZip() {
-		String last = "rm " + ZIP_FOLDER + "*";
-		exec(last);
-	}*/
+	/*
+	 * public static final void deleteAllZip() { String last = "rm " +
+	 * ZIP_FOLDER + "*"; exec(last); }
+	 */
 
 	public static final String readTxtFile(String filePath) {
 		return readTxtFile(new File(filePath));
 	}
-
 
 	private static final String readTxtFile(File file) {
 		try {

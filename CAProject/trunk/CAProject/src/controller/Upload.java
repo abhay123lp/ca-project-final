@@ -3,7 +3,6 @@ package controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +18,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 
+import util.PropertyLoader;
 import dao.CertificateAuthority;
 //import org.apache.tomcat.util.http.fileupload.FileItem;
 
@@ -27,7 +27,7 @@ import dao.CertificateAuthority;
 @WebServlet("/Upload")
 public class Upload extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
+
 
     public Upload() {
         super();
@@ -35,7 +35,7 @@ public class Upload extends HttpServlet {
     }
 
 
-    private String saveFile = "/home/annvcit/Desktop/clientupload_folder/";
+    private String saveFile = PropertyLoader.loadProperty("client_upload_folder");
     
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html;charset=UTF-8");
