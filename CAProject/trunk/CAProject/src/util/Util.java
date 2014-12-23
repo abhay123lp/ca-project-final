@@ -3,12 +3,8 @@
  */
 package util;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 
 /**
@@ -18,60 +14,19 @@ import java.io.FileReader;
  * @email annvcit@gmail.com
  */
 public final class Util {
-
-	private static final String CLIENTS_FOLDER = "~/Desktop/clients_folder/";
-	private static final String ZIP_FOLDER = "~/Desktop/zip_folder/";
-	private static final String UPLOAD_FOLDER = "~/Desktop/clientupload_folder/";
-
-	public static final String mkdirs(String dirName) {
-		String path = "";
-		try {
-			Runtime r = Runtime.getRuntime();
-			path = "mkdir -p " + CLIENTS_FOLDER + dirName + "/";
-			String[] cmd = new String[] { "/bin/bash", "-c", path };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return CLIENTS_FOLDER + dirName + "/";
+	static {
+		CLIENTS_FOLDER = PropertyLoader.loadProperty("client_folder");
+		ZIP_FOLDER = PropertyLoader.loadProperty("zip_folder");
 	}
-
-	private static final void deleteCSRFile(String csrPath) {
+	
+	private static String CLIENTS_FOLDER = null;
+	private static String ZIP_FOLDER = null;;
+	
+	// execute một command 
+	public static final void exec(String command) {
 		try {
 			Runtime r = Runtime.getRuntime();
-			String last = "rm " + csrPath;
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static final String zip(String folderPath, String commonName) {
-		String csrPath = folderPath + commonName + "/" + commonName + ".csr";
-		deleteCSRFile(csrPath);
-		String zipPath = ZIP_FOLDER + commonName + ".zip";
-		try {
-			Runtime r = Runtime.getRuntime();
-			String last = "cd " + folderPath + " && zip -r " + zipPath + " "
-					+ commonName;
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return zipPath;
-
-	}
-
-	public static final void deleteAllZip() {
-		try {
-			Runtime r = Runtime.getRuntime();
-			String last = "rm " + ZIP_FOLDER + "*";
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
+			String[] cmd = new String[] { "/bin/bash", "-c", command };
 			Process p1 = r.exec(cmd);
 			p1.waitFor();
 		} catch (Exception e) {
@@ -79,14 +34,47 @@ public final class Util {
 		}
 	}
 	
+	// xóa thư mục
+	public static final String mkdirs(String dirName) {
+		String path = CLIENTS_FOLDER + dirName + "/";
+		String command =  "mkdir -p " + path;
+		exec(command);
+		return CLIENTS_FOLDER + dirName + "/";
+	}
 
+	// xóa file csr - certificate request signing
+	private static final void deleteCSRFile(String csrPath) {
+		String command = "rm " + csrPath;
+		exec(command);
+	}
+
+	// nén folder thành file zip để gửi cho client
+	// folderPath & commonName: param cần thiết để xóa file *.csr 
+		// vì chỉ gửi cho client file *.crt và file *.key (private key)
+	public static final String zip(String folderPath, String commonName) {
+		String csrPath = folderPath + commonName + "/" + commonName + ".csr";
+		deleteCSRFile(csrPath);
+		String zipFilePath = ZIP_FOLDER + commonName + ".zip";
+		String cd = "cd " + folderPath + " ";
+		String zip = "&& zip -r " + zipFilePath + " " + commonName;
+		String command = cd + zip;
+		exec(command);
+		return zipFilePath;
+
+	}
+
+	
+	/*public static final void deleteAllZip() {
+		String last = "rm " + ZIP_FOLDER + "*";
+		exec(last);
+	}*/
 
 	public static final String readTxtFile(String filePath) {
 		return readTxtFile(new File(filePath));
 	}
 
 
-	public static final String readTxtFile(File file) {
+	private static final String readTxtFile(File file) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 			String out = "";
@@ -100,32 +88,6 @@ public final class Util {
 			e.printStackTrace();
 		}
 		return null;
-	}
-	
-	public static final String readCert(String certFromClientPath) {
-		File clientCert = new File(certFromClientPath);
-		File inServer = new File(UPLOAD_FOLDER + clientCert.getName());
-		String path = inServer.getAbsolutePath();
-		try {
-			BufferedInputStream bis = new BufferedInputStream(
-										new FileInputStream(clientCert));
-			BufferedOutputStream bos = new BufferedOutputStream(
-										new FileOutputStream(inServer));
-			
-			byte[] buffer = new byte[1024]; // 1024 bytes
-			int byteRead;
-			
-			while ((byteRead = bis.read(buffer)) != -1) {
-				bos.write(buffer, 0, byteRead);
-			}
-			
-			bis.close();
-			bos.close();
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return path;
 	}
 
 }

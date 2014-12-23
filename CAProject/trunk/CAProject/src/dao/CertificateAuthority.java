@@ -5,6 +5,7 @@ package dao;
 
 import java.io.File;
 
+import util.PropertyLoader;
 import util.Util;
 
 /**
@@ -14,87 +15,61 @@ import util.Util;
  * @email annvcit@gmail.com
  */
 public final class CertificateAuthority {
+	static {
+		CA_PRIKEY = PropertyLoader.loadProperty("ca_prikey");
+		CA_CERT = PropertyLoader.loadProperty("ca_cert");
+		CLIENTS_FOLDER = PropertyLoader.loadProperty("clients_folder");
+		VERIFY_FOLDER = PropertyLoader.loadProperty("verify_folder");
+		CA_PASSWORD = PropertyLoader.loadProperty("ca_password");
+	}
+	private static String CA_PRIKEY = "~/Desktop/ca_folder/prikey.key";
+	private static String CA_CERT = "~/Desktop/ca_folder/cacert.crt";
+	private static String CLIENTS_FOLDER = "~/Desktop/clients_folder/";
+	private static String VERIFY_FOLDER = "/home/annvcit/Desktop/verify_folder/";
+	private static String CA_PASSWORD = "password";
 
-	private static final String CA_FOLDER = "~/Desktop/ca_folder/";
-	private static final String CA_PRIKEY = "~/Desktop/ca_folder/prikey.key";
-	private static final String CA_CERT = "~/Desktop/ca_folder/cacert.crt";
-	private static final String CLIENTS_FOLDER = "~/Desktop/clients_folder/";
-	private static final String VERIFY_FOLDER = "~/Desktop/verify_folder/";
-	private static final String CA_PASSWORD = "password";
-
+	// tạo private key cho client => tạo csr
 	private static final void generatePrivateKey(DistinguishedName dn) {
 		String path = Util.mkdirs(dn.getCn());
-		try {
-			Runtime r = Runtime.getRuntime();
-			String last = "openssl genrsa -des3 -out " + path + dn.getCn()
-					+ ".key -passout pass:" + dn.getPassword() + " 1024 && cd "
-					+ path + " && openssl rsa -in " + dn.getCn()
-					+ ".key -passin pass:" + dn.getPassword()
-					+ " -outform der " + dn.getCn() + ".der";
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		String genPriKey = "openssl genrsa -des3 -out " + path + dn.getCn()
+				+ ".key -passout pass:" + dn.getPassword() + " 1024";
+		Util.exec(genPriKey);
 	}
 
+	// tạo certificate signing request => tạo certificate
 	private static final void generateCSR(DistinguishedName dn) {
 		String path = Util.mkdirs(dn.getCn());
-		try {
-			Runtime r = Runtime.getRuntime();
-			String last = "openssl req -new -key " + path + dn.getCn()
-					+ ".key -passin pass:" + dn.getPassword() + " -out " + path
-					+ dn.getCn() + ".csr -subj " + dn.toString();
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		String genCSR = "openssl req -new -key " + path + dn.getCn()
+				+ ".key -passin pass:" + dn.getPassword() + " -out " + path
+				+ dn.getCn() + ".csr -subj " + dn.toString();
+		Util.exec(genCSR);
 	}
 
+	// tạo certificate cho client 
+	// return về đường dẫn file zip chứa file *.cert và *.key => cho client download
 	public static final String genCert(DistinguishedName dn) {
 		generatePrivateKey(dn);
 		generateCSR(dn);
 		String path = Util.mkdirs(dn.getCn());
-		try {
-			Runtime r = Runtime.getRuntime();
-			String last = "openssl x509 -req -days 365 -in " + path
-					+ dn.getCn() + ".csr -CA " + CA_CERT + " -CAkey "
-					+ CA_PRIKEY + " -passin pass:" + CA_PASSWORD
-					+ " -CAcreateserial -out " + path + dn.getCn() + ".crt";
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-			return Util.zip(CLIENTS_FOLDER, dn.getCn());
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+		String genCert = "openssl x509 -req -days 365 -in " + path
+				+ dn.getCn() + ".csr -CA " + CA_CERT + " -CAkey "
+				+ CA_PRIKEY + " -passin pass:" + CA_PASSWORD
+				+ " -CAcreateserial -out " + path + dn.getCn() + ".crt";
+		Util.exec(genCert);
+		return Util.zip(CLIENTS_FOLDER, dn.getCn());
 	}
 
+	// verify certificate
 	public static final boolean verify(String certPath) {
-		try {
-			File clientCRT = new File(certPath);
-			Runtime r = Runtime.getRuntime();
-			String txtOutPath = VERIFY_FOLDER + clientCRT.getName();
-			String last = "openssl verify -CAfile " + CA_CERT + " " + clientCRT.getPath()
-					+ " > " + "1.txt";
-			System.out.println(last);
-			String[] cmd = new String[] { "/bin/bash", "-c", last };
-			Process p1 = r.exec(cmd);
-			p1.waitFor();
-			
-			String result = Util.readTxtFile("1.txt");
-			if (result.contains("OK")) {
-				return true;
-			}
+		File clientCRT = new File(certPath);
+		String textFilePath = VERIFY_FOLDER + clientCRT.getName() + ".txt";
+		String command = "openssl verify -CAfile " + CA_CERT + " " + clientCRT.getPath()
+				+ " > " + textFilePath;
+		Util.exec(command);
+		String result = Util.readTxtFile(textFilePath);
+		if (result.contains("OK")) {
 			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 		return false;
 	}
-
 }

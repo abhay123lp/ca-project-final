@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import util.Util;
+import util.PropertyLoader;
 import dao.CertificateAuthority;
 import dao.DistinguishedName;
 
@@ -80,8 +80,7 @@ public class ReciveCSR extends HttpServlet {
 
 		try {
 			ServletOutputStream out = response.getOutputStream();
-//			String path = "/root";
-			String path = "/home/annvcit";
+			String path = PropertyLoader.loadProperty("root");
 			BufferedInputStream bis = new BufferedInputStream(
 					new FileInputStream(zip.replace("~", path)));
 
@@ -97,6 +96,6 @@ public class ReciveCSR extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Util.deleteAllZip();
+		//Util.deleteAllZip();
 	}
 }
