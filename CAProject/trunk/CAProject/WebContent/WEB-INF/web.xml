@@ -9,5 +9,9 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  
+  <servlet>
+    <servlet-name>PublishService</servlet-name>
+    <servlet-class>webservice.PublishWebService</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
 </web-app>
