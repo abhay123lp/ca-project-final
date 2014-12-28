@@ -65,6 +65,7 @@ public final class CertificateAuthority {
 		Util.exec(command);
 		String result = Util.readTxtFile(textFilePath);
 		Util.exec("rm -rf " + textFilePath);
+		Util.exec("rm -rf " + certPath);
 		if (result.contains("OK")) {
 			return true;
 		}

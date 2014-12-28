@@ -4,6 +4,8 @@ package webservice;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
+import util.PropertyLoader;
+
 /**
  * @author annvcit
  * @full_name Nguyen Van Chuc An
@@ -15,14 +17,15 @@ import javax.jws.WebService;
 @WebService
 public class ImplVerify implements IVerify{
 
-    private String VERIFY_FOLDER = util.PropertyLoader.loadProperty("verify_folder");
+    private String CLIENT_UPLOAD_FOLDER = PropertyLoader.loadProperty("client_upload_folder");
     
     @WebMethod
     @Override
     public boolean verify(String fileName, byte[] fileBytes) {
         IUpload uploader = new ImplUpload();
         uploader.upload(fileName, fileBytes);
-        String filePath = VERIFY_FOLDER + fileName;
+        String filePath = CLIENT_UPLOAD_FOLDER + fileName;
+        System.out.println(filePath);
         return dao.CertificateAuthority.verify(filePath);
     }
 
