@@ -82,9 +82,14 @@ public class DistinguishedName {
 
 	@Override
 	public String toString() {
-		return "\"/C=" + this.c + "/ST=" + this.st + "/L=" + this.l + "/O="
-				+ this.orgName + "/OU=" + this.orgUnit + "/CN=" + this.cn
-				+ "/emailAddress=" + this.emailAddress + "\"";
+		return "\"/C=" + this.c 
+				+ "/ST=" + this.st 
+				+ "/L=" + this.l 
+				+ "/O=" + this.orgName 
+				+ "/OU=" + this.orgUnit 
+				+ "/CN=" + this.cn
+				+ "/emailAddress=" + this.emailAddress 
+				+ "\"";
 	}
 
 	private String convertCN(String cn) {
