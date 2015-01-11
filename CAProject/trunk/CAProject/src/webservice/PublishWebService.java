@@ -30,7 +30,7 @@ public class PublishWebService extends HttpServlet {
 		String bindingURI = PropertyLoader.loadProperty("bindingURI");
 		IVerify service = new ImplVerify();
 		Endpoint.publish(bindingURI, service);
-		System.out.println("Server started at: " + bindingURI);
+		System.out.println("Service started at: " + bindingURI);
 	}
 
 }
